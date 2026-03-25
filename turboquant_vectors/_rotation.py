@@ -53,10 +53,11 @@ def derive_seed_from_key(seed: int, dim: int) -> int:
     Returns:
         Derived 128-bit integer seed for numpy RNG.
     """
+    import hmac
     seed_bytes = seed.to_bytes(max(16, (seed.bit_length() + 7) // 8), 'big')
     info = f"tqkey-d{dim}".encode()
-    # HMAC-SHA256 as a simple key derivation
-    derived = hashlib.sha256(seed_bytes + info).digest()
+    # HMAC-SHA256 key derivation (seed as key, dimension info as message)
+    derived = hmac.new(seed_bytes, info, hashlib.sha256).digest()
     return int.from_bytes(derived[:16], 'big')
 
 

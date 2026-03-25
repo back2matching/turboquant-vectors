@@ -17,4 +17,4 @@ Privacy:
 __version__ = "0.2.0"
 
 from turboquant_vectors.core import compress, decompress, search, TurboQuantVectors
-from turboquant_vectors.private import PrivateEncoder
+from turboquant_vectors.private import PrivateEncoder, CompressedPrivateVectors

@@ -441,12 +441,19 @@ class PrivateEncoder:
         if vectors.ndim != 2 or vectors.shape[1] != self._dim:
             raise ValueError(f"Expected (n, {self._dim}) array, got {vectors.shape}")
 
-        # Step 1: Rotate for privacy (with normalization if configured)
+        # Capture original norms BEFORE normalization so decompress() can
+        # reconstruct approximate original magnitudes (not just unit vectors).
+        original_norms = np.linalg.norm(vectors, axis=1)
+
+        # Step 1: Rotate for privacy (uses self._normalize setting)
         rotated = self.rotate(vectors)
 
-        # Step 2: Normalize rotated vectors for quantization
-        norms = np.linalg.norm(rotated, axis=1)
-        safe_norms = np.maximum(norms, 1e-10)
+        # Step 2: Normalize rotated vectors for quantization.
+        # Rotation preserves norms, so if normalize=True was applied in
+        # rotate(), these are already ~1.0. We still normalize for the
+        # quantizer but store original_norms for faithful decompression.
+        rot_norms = np.linalg.norm(rotated, axis=1)
+        safe_norms = np.maximum(rot_norms, 1e-10)
         unit_rotated = rotated / safe_norms[:, np.newaxis]
 
         # Step 3: Compute codebook (same as TurboQuantVectors but for the rotated space)
@@ -465,7 +472,7 @@ class PrivateEncoder:
 
         return CompressedPrivateVectors(
             indices=indices,
-            norms=norms.astype(np.float32),
+            norms=original_norms.astype(np.float32),
             codebook=codebook,
             bits=bits,
             dim=self._dim,
@@ -592,17 +599,29 @@ class CompressedPrivateVectors:
             d_norm = np.linalg.norm(decompressed, axis=1, keepdims=True)
             data_unit = decompressed / np.maximum(d_norm, 1e-10)
             scores = query_unit @ data_unit.T
-            # Higher is better for cosine
-            top_idx = np.argsort(-scores, axis=1)[:, :top_k]
         elif metric == "ip":
             scores = query @ decompressed.T
-            top_idx = np.argsort(-scores, axis=1)[:, :top_k]
         elif metric == "l2":
-            # L2 distance: lower is better
-            scores = -np.sum((query[:, np.newaxis, :] - decompressed[np.newaxis, :, :]) ** 2, axis=2)
-            top_idx = np.argsort(-scores, axis=1)[:, :top_k]  # Negate so argsort works
+            # L2 distance via ||a-b||^2 = ||a||^2 + ||b||^2 - 2<a,b>
+            # This is O(n_queries * n_vectors) memory, not O(n_q * n_v * dim)
+            q_sq = np.sum(query ** 2, axis=1, keepdims=True)  # (n_q, 1)
+            d_sq = np.sum(decompressed ** 2, axis=1)  # (n_v,)
+            dot = query @ decompressed.T  # (n_q, n_v)
+            sq_dists = q_sq + d_sq[np.newaxis, :] - 2 * dot
+            scores = -sq_dists  # Negate: higher = closer
         else:
             raise ValueError(f"Unknown metric: {metric}. Use 'cosine', 'l2', or 'ip'.")
+
+        # Efficient top-k via argpartition (O(n) vs O(n log n) for argsort)
+        n_vecs = scores.shape[1]
+        if n_vecs <= top_k:
+            top_idx = np.argsort(-scores, axis=1)
+        else:
+            top_idx = np.argpartition(-scores, top_k, axis=1)[:, :top_k]
+            # Sort the top-k by score
+            for i in range(len(top_idx)):
+                order = np.argsort(-scores[i, top_idx[i]])
+                top_idx[i] = top_idx[i, order]
 
         top_scores = np.take_along_axis(scores, top_idx, axis=1)
 
