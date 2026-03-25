@@ -25,6 +25,23 @@ class CompressedVectors:
     bits: int
     n_vectors: int
 
+    def save(self, path: str):
+        """Save compressed vectors to .npz file."""
+        np.savez_compressed(path,
+            indices=self.indices, norms=self.norms,
+            rotation=self.rotation, codebook=self.codebook,
+            meta=np.array([self.dim, self.bits, self.n_vectors]))
+
+    @staticmethod
+    def load(path: str) -> 'CompressedVectors':
+        """Load compressed vectors from .npz file."""
+        data = np.load(path)
+        meta = data['meta']
+        return CompressedVectors(
+            indices=data['indices'], norms=data['norms'],
+            rotation=data['rotation'], codebook=data['codebook'],
+            dim=int(meta[0]), bits=int(meta[1]), n_vectors=int(meta[2]))
+
     @property
     def memory_bytes(self) -> int:
         """Memory used by compressed representation (packed bits)."""
