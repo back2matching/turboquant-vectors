@@ -15,7 +15,7 @@ indices, scores = search(compressed, query, top_k=10)
 
 RAG on consumer hardware is memory-constrained. 1M documents at 1536-dim = 6.1 GB just for the embedding index. Add a 30B model and you're out of VRAM.
 
-FAISS Product Quantization helps but requires k-means training per dataset. TurboQuant is instant (data-oblivious), compresses 2.4x faster, and gets +8pp better recall at the same storage budget.
+FAISS Product Quantization helps but requires k-means training per dataset. TurboQuant is instant (data-oblivious), compresses 2-2.5x faster, and gets up to +8pp better recall at the same storage budget on our synthetic matched-budget benchmark.
 
 ## Benchmarks
 
@@ -35,7 +35,7 @@ Same bytes per vector for both methods. Fair comparison.
 | 2-bit (384 B/vec) | **52.8%** | 45.7% | **+7.1pp** | 3.8s vs 8.5s |
 | 4-bit (768 B/vec) | **83.8%** | 75.8% | **+8.0pp** | 6.5s vs 16.0s |
 
-TurboQuant wins at 2-bit and 4-bit. FAISS PQ is slightly better at ultra-compact 1-bit. TurboQuant compresses 2-2.5x faster because it skips k-means training.
+On synthetic clustered data, TurboQuant wins at 2-bit and 4-bit. FAISS PQ is slightly better at ultra-compact 1-bit. TurboQuant compresses 2-2.5x faster because it skips k-means training.
 
 ### Compression ratios (50K vectors, 1536-dim)
 
@@ -48,10 +48,10 @@ TurboQuant wins at 2-bit and 4-bit. FAISS PQ is slightly better at ultra-compact
 ## Install
 
 ```bash
-pip install turboquant-vectors  # coming soon
-# For now:
-git clone https://github.com/back2matching/turboquant-vectors
-cd turboquant-vectors && pip install -e .
+pip install turboquant-vectors
+
+# With FAISS comparison benchmark support:
+pip install turboquant-vectors[faiss]
 ```
 
 ## Usage

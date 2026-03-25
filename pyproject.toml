@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "turboquant-vectors"
-version = "0.1.0"
-description = "Compress embeddings 8x instantly with TurboQuant. No training needed. +8pp recall vs FAISS PQ at matched storage."
+version = "0.1.0b1"
+description = "Compress embeddings 8x instantly with TurboQuant. No training needed. Up to +8pp recall vs FAISS PQ at matched storage."
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
