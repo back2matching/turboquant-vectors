@@ -158,42 +158,56 @@ class TurboQuantVectors:
 
         return x_hat
 
+    def decompress_normalized(self, compressed: CompressedVectors) -> np.ndarray:
+        """Decompress and L2-normalize (cached for repeated search)."""
+        if not hasattr(compressed, '_cache_normalized'):
+            decompressed = self.decompress(compressed)
+            norms = np.linalg.norm(decompressed, axis=1, keepdims=True)
+            compressed._cache_normalized = decompressed / np.maximum(norms, 1e-10)
+        return compressed._cache_normalized
+
     def search(self, compressed: CompressedVectors, query: np.ndarray,
                top_k: int = 10) -> Tuple[np.ndarray, np.ndarray]:
         """
         Search compressed vectors for nearest neighbors to query.
 
-        Uses approximate inner product on compressed representation.
-        For exact results, decompress first then search.
-
-        Args:
-            compressed: compressed vector set
-            query: float32 query vector, shape (dim,) or (n_queries, dim)
+        First call decompresses vectors (cached for subsequent queries).
+        Supports single query (dim,) or batch queries (n_queries, dim).
 
         Returns:
             (indices, scores) — top_k nearest neighbors and their scores
         """
         query = np.asarray(query, dtype=np.float32)
-        if query.ndim == 1:
+        single = query.ndim == 1
+        if single:
             query = query[np.newaxis, :]
 
-        # Decompress and compute inner products
-        # (For v1, full decompression. v2 can do approximate search on compressed.)
-        decompressed = self.decompress(compressed)
-
-        # Cosine similarity (normalize query too)
+        # Normalize query
         query_norm = np.linalg.norm(query, axis=1, keepdims=True)
         query_unit = query / np.maximum(query_norm, 1e-10)
-        vec_norms = np.linalg.norm(decompressed, axis=1, keepdims=True)
-        vec_unit = decompressed / np.maximum(vec_norms, 1e-10)
 
+        # Get normalized vectors (cached after first call)
+        vec_unit = self.decompress_normalized(compressed)
+
+        # Cosine similarity
         scores = query_unit @ vec_unit.T  # (n_queries, n_vectors)
 
-        # Get top-k
-        top_indices = np.argsort(-scores, axis=1)[:, :top_k]
+        # Top-k
+        if scores.shape[1] <= top_k:
+            top_indices = np.argsort(-scores, axis=1)
+        else:
+            # Use argpartition for speed on large sets
+            top_indices = np.argpartition(-scores, top_k, axis=1)[:, :top_k]
+            # Sort the top-k by score
+            for i in range(len(top_indices)):
+                order = np.argsort(-scores[i, top_indices[i]])
+                top_indices[i] = top_indices[i, order]
+
         top_scores = np.take_along_axis(scores, top_indices, axis=1)
 
-        return top_indices.squeeze(), top_scores.squeeze()
+        if single:
+            return top_indices.squeeze(0), top_scores.squeeze(0)
+        return top_indices, top_scores
 
 
 # Convenience functions
