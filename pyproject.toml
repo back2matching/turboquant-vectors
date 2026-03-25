@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "turboquant-vectors"
-version = "0.1.0b1"
-description = "Compress embeddings 8x instantly with TurboQuant. No training needed. Up to +8pp recall vs FAISS PQ at matched storage."
+version = "0.2.0"
+description = "Compress and protect embeddings with TurboQuant. Zero-loss privacy via orthogonal rotation + 8x compression. No training needed."
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
 authors = [{name = "back2matching"}]
-keywords = ["embeddings", "vector-search", "compression", "quantization", "turboquant", "faiss", "rag", "numpy"]
+keywords = ["embeddings", "vector-search", "compression", "quantization", "turboquant", "faiss", "rag", "numpy", "privacy", "embedding-privacy", "vec2text", "pinecone", "weaviate", "qdrant"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: Apache Software License",

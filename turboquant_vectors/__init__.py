@@ -1,16 +1,20 @@
 """
-turboquant-vectors: Compress embeddings 6x instantly with TurboQuant.
+turboquant-vectors: Compress and protect embeddings with TurboQuant.
 
 First pip package applying Google's TurboQuant (ICLR 2026) to vector search.
 No training needed. Drop-in for numpy, FAISS, ChromaDB.
 
-Usage:
+Compression:
     from turboquant_vectors import compress, decompress, search
+    compressed = compress(embeddings, bits=4)  # 8x smaller
 
-    compressed = compress(embeddings, bits=4)  # 6x smaller
-    results = search(compressed, query, top_k=10)  # search on compressed
+Privacy:
+    from turboquant_vectors import PrivateEncoder
+    encoder = PrivateEncoder.generate(dim=1536)
+    rotated = encoder.rotate(embeddings)  # search works identically
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from turboquant_vectors.core import compress, decompress, search, TurboQuantVectors
+from turboquant_vectors.private import PrivateEncoder
