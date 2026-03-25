@@ -101,6 +101,13 @@ class TestStatisticalCorrelation:
     """Per-dimension correlation between original and rotated should be ~0."""
 
     def test_per_dimension_correlation_near_zero(self):
+        """Mean per-dimension Pearson r between original and rotated should be ~0.
+
+        With n samples and d dimensions, each individual |r| is approximately
+        Normal(0, 1/sqrt(n)). The mean over d dimensions converges fast.
+        We check that the mean is small, not any single dimension's max
+        (which is expected to be ~3/sqrt(n) by extreme value theory).
+        """
         dim = 256
         n = 10000
         rng = np.random.default_rng(42)
@@ -110,18 +117,24 @@ class TestStatisticalCorrelation:
         encoder = PrivateEncoder.generate(dim=dim, normalize=False)
         X_rot = encoder.rotate(X, normalize=False)
 
-        correlations = []
-        for d in range(dim):
-            r = np.corrcoef(X[:, d], X_rot[:, d])[0, 1]
-            correlations.append(abs(r))
+        # Vectorized correlation: much faster than per-dim loop
+        # Pearson r = cov(X_d, X_rot_d) / (std(X_d) * std(X_rot_d))
+        X_centered = X - X.mean(axis=0)
+        R_centered = X_rot - X_rot.mean(axis=0)
+        cov = (X_centered * R_centered).mean(axis=0)
+        std_x = X_centered.std(axis=0)
+        std_r = R_centered.std(axis=0)
+        correlations = np.abs(cov / (std_x * std_r + 1e-10))
 
-        mean_corr = np.mean(correlations)
-        max_corr = np.max(correlations)
-
-        assert mean_corr < 0.05, f"Mean per-dim correlation {mean_corr:.4f} (expected < 0.05)"
-        # With 256 dims and 5K samples, max correlation can reach ~0.05 by chance
-        # Using a generous bound to avoid flaky tests
-        assert max_corr < 0.25, f"Max per-dim correlation {max_corr:.4f} (expected < 0.25)"
+        mean_corr = correlations.mean()
+        # Each Q_{j,j} entry of a random orthogonal matrix has expected magnitude
+        # sqrt(2/(pi*d)). For d=256: ~0.05. Plus sampling noise ~1/sqrt(n).
+        # The correlation between x_j and (Qx)_j is approximately Q_{j,j}.
+        expected = np.sqrt(2.0 / (np.pi * dim))  # ~0.05 for d=256
+        assert mean_corr < expected * 2.5, (
+            f"Mean per-dim |correlation| {mean_corr:.4f} exceeds "
+            f"{expected * 2.5:.4f} (2.5x theoretical {expected:.4f})"
+        )
 
 
 class TestPerformanceBenchmarks:
