@@ -26,5 +26,8 @@ dev = ["pytest"]
 [project.urls]
 Homepage = "https://github.com/back2matching/turboquant-vectors"
 
+[project.scripts]
+tq-vectors = "turboquant_vectors.cli:main"
+
 [tool.setuptools.packages.find]
 include = ["turboquant_vectors*"]
