@@ -16,7 +16,7 @@ encoder.save_key("secret.tqkey")           # treat like an SSH key
 
 ## Embedding Privacy
 
-Vec2Text recovers 92% of original text from unprotected embeddings. ALGEN needs only 1,000 leaked pairs. OWASP lists this as LLM08 in their 2025 Top 10.
+Vec2Text recovers 92% of original text from unprotected embeddings (32-token inputs, GTR-base encoder). ALGEN needs only 1,000 leaked pairs. OWASP lists this as LLM08 in their 2025 Top 10.
 
 PrivateEncoder applies a secret orthogonal rotation before you send embeddings to a third-party vector DB. The math:
 
@@ -24,7 +24,7 @@ PrivateEncoder applies a secret orthogonal rotation before you send embeddings t
 <Qx, Qy> = x^T Q^T Q y = x^T y = <x, y>
 ```
 
-Cosine similarity, L2 distance, inner product -- all preserved exactly. Not approximately. Exactly.
+Cosine similarity, L2 distance, inner product -- all preserved exactly (up to float32 precision, ~1e-6 error).
 
 ### Quick start
 

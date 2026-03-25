@@ -437,6 +437,9 @@ class PrivateEncoder:
         Returns:
             CompressedPrivateVectors with search() and save()/load().
         """
+        if not (1 <= bits <= 8):
+            raise ValueError(f"bits must be 1-8, got {bits}")
+
         vectors = np.asarray(vectors, dtype=np.float32)
         if vectors.ndim != 2 or vectors.shape[1] != self._dim:
             raise ValueError(f"Expected (n, {self._dim}) array, got {vectors.shape}")
