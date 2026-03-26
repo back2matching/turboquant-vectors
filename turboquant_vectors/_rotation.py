@@ -124,7 +124,7 @@ def compute_codebook(dim: int, bits: int) -> np.ndarray:
     """
     Optimal codebook for Gaussian-like distribution after rotation.
 
-    Uses Lloyd-Max optimal centroids for bits 1-4, uniform quantization for 5-8.
+    Uses Lloyd-Max optimal centroids for bits 1-8.
     Shared by both TurboQuantVectors (compression) and PrivateEncoder (rotate_and_compress).
     """
     sigma = 1.0 / math.sqrt(dim)
@@ -142,14 +142,17 @@ def compute_codebook(dim: int, bits: int) -> np.ndarray:
         # Lloyd-Max optimal centroids for N(0,1), 16 levels
         lloyd = [0.1304, 0.3939, 0.6661, 0.9545, 1.2703, 1.6330, 2.0837, 2.7456]
     elif bits == 5:
+        # Lloyd-Max optimal centroids for N(0,1), 32 levels
         lloyd = [0.0704, 0.2116, 0.3536, 0.4973, 0.6433, 0.7926, 0.9463, 1.1058,
                  1.2731, 1.4507, 1.6425, 1.8541, 2.0947, 2.3814, 2.7506, 3.3133]
     elif bits == 6:
+        # Lloyd-Max optimal centroids for N(0,1), 64 levels
         lloyd = [0.0418, 0.1254, 0.2090, 0.2927, 0.3764, 0.4602, 0.5442, 0.6283,
                  0.7125, 0.7971, 0.8820, 0.9674, 1.0533, 1.1399, 1.2274, 1.3160,
                  1.4060, 1.4978, 1.5916, 1.6880, 1.7877, 1.8914, 2.0002, 2.1152,
                  2.2382, 2.3716, 2.5187, 2.6845, 2.8775, 3.1126, 3.4228, 3.9080]
     elif bits == 7:
+        # Lloyd-Max optimal centroids for N(0,1), 128 levels
         lloyd = [0.0228, 0.0684, 0.1139, 0.1595, 0.2051, 0.2507, 0.2963, 0.3418,
                  0.3874, 0.4330, 0.4786, 0.5242, 0.5697, 0.6153, 0.6609, 0.7065,
                  0.7520, 0.7976, 0.8432, 0.8888, 0.9344, 0.9799, 1.0255, 1.0711,
@@ -159,6 +162,7 @@ def compute_codebook(dim: int, bits: int) -> np.ndarray:
                  2.2558, 2.3136, 2.3742, 2.4383, 2.5064, 2.5795, 2.6584, 2.7446,
                  2.8396, 2.9457, 3.0660, 3.2053, 3.3714, 3.5782, 3.8564, 4.2996]
     elif bits == 8:
+        # Lloyd-Max optimal centroids for N(0,1), 256 levels
         lloyd = [0.0117, 0.0350, 0.0583, 0.0816, 0.1049, 0.1282, 0.1515, 0.1749,
                  0.1982, 0.2215, 0.2448, 0.2681, 0.2914, 0.3148, 0.3381, 0.3614,
                  0.3847, 0.4080, 0.4313, 0.4546, 0.4780, 0.5013, 0.5246, 0.5479,
