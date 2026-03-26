@@ -98,9 +98,12 @@ python benchmarks/real_data_benchmark.py   # Compression benchmark (needs faiss-
 - The path to adoption is: one blog post, one LangChain PR, one real user.
 - Do not over-plan. Execute the WORKFLOW.md task queue.
 
-## Parent Project
+## Related Projects
 
-Satellite of [FlockRun](https://github.com/back2matching/flockrun).
+Part of the TurboQuant family under [back2matching](https://github.com/back2matching):
+- **turboquant** — KV cache compression (PyTorch/CUDA), 0.1.0 on PyPI
+- **kvcache-bench** — KV cache benchmarking tool, 0.1.0 on PyPI
+- **quant-sim** — quantization level benchmarking tool
 
 ## PyPI
 

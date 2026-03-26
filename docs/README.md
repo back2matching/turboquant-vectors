@@ -30,6 +30,6 @@ docs/
 - **C: Credibility** (next 2 weeks — SIFT1M, VIBE, blog)
 - **D: 0.4 Features** (next month — CLI privacy, strict mode, LangChain)
 
-## Research originated in FlockRun
+## Related repos
 
-This project started as research in the FlockRun repo. The high-level TurboQuant ecosystem strategy (8 ideas, ranked) lives at `FlockRun/docs/research/TURBOQUANT-NEXT-MOVES.md` and is mirrored here at `research/TURBOQUANT-NEXT-MOVES.md`.
+Part of the TurboQuant family under [back2matching](https://github.com/back2matching). The ecosystem strategy docs (`TURBOQUANT-NEXT-MOVES.md`, `TURBOQUANT-COMBINATIONS.md`) live in `research/` in this repo.
