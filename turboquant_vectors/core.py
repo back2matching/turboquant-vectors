@@ -11,7 +11,8 @@ per-coordinate quantization without any training data (data-oblivious).
 import numpy as np
 from typing import Optional, Tuple
 from dataclasses import dataclass
-import math
+
+from turboquant_vectors._rotation import compute_codebook
 
 
 @dataclass
@@ -90,33 +91,8 @@ class TurboQuantVectors:
         self.rotation = Q.astype(np.float32)
         self.rotation_t = Q.T.astype(np.float32)
 
-        # Compute optimal codebook for Beta distribution
-        self.codebook = self._compute_codebook(dim, bits)
-
-    def _compute_codebook(self, dim: int, bits: int) -> np.ndarray:
-        """Optimal codebook for Gaussian-like distribution after rotation."""
-        sigma = 1.0 / math.sqrt(dim)
-        # Lloyd-Max optimal centroids for Gaussian(0, sigma^2)
-        if bits == 1:
-            c = math.sqrt(2.0 / (math.pi * dim))
-            return np.array([-c, c], dtype=np.float32)
-        elif bits == 2:
-            lloyd = [0.4528, 1.5104]
-        elif bits == 3:
-            lloyd = [0.1284, 0.3882, 0.6568, 0.9423]
-        elif bits == 4:
-            lloyd = [0.1284, 0.3882, 0.6568, 0.9423, 1.2562, 1.6180, 2.0690, 2.7326]
-        else:
-            # For higher bits, use uniform quantization
-            n = 2 ** (bits - 1)
-            lloyd = [(i + 0.5) / n * 3.0 for i in range(n)]
-
-        centroids = []
-        for v in reversed(lloyd):
-            centroids.append(-v * sigma)
-        for v in lloyd:
-            centroids.append(v * sigma)
-        return np.array(centroids, dtype=np.float32)
+        # Compute optimal codebook
+        self.codebook = compute_codebook(dim, bits)
 
     def compress(self, vectors: np.ndarray) -> CompressedVectors:
         """
@@ -129,7 +105,12 @@ class TurboQuantVectors:
             CompressedVectors with quantized indices and metadata
         """
         vectors = np.asarray(vectors, dtype=np.float32)
-        assert vectors.ndim == 2 and vectors.shape[1] == self.dim
+        if vectors.ndim != 2 or vectors.shape[1] != self.dim:
+            raise ValueError(
+                f"Expected 2D array with dim={self.dim}, got shape {vectors.shape}"
+            )
+        if not np.isfinite(vectors).all():
+            raise ValueError("Input contains NaN or inf values")
 
         n = vectors.shape[0]
 

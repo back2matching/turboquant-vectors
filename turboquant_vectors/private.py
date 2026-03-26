@@ -28,6 +28,7 @@ from turboquant_vectors._rotation import (
     derive_seed_from_key,
     validate_orthogonal,
     fingerprint as _fingerprint,
+    compute_codebook,
 )
 
 
@@ -223,18 +224,20 @@ class PrivateEncoder:
         header = _TQKEY_MAGIC + struct.pack('<I', self._dim) + b'\x00' * 4
         path.write_bytes(header + matrix_bytes + checksum)
 
-        # Warn about permissions on Unix-like systems
-        try:
-            import os
-            mode = os.stat(path).st_mode
-            if mode & 0o077:  # world or group readable
-                warnings.warn(
-                    f"Key file {path} is readable by other users (mode {oct(mode)}). "
-                    f"Consider: chmod 600 {path}",
-                    stacklevel=2,
-                )
-        except (OSError, AttributeError):
-            pass  # Windows or other systems without Unix permissions
+        # Warn about permissions on Unix-like systems (skip on Windows)
+        import sys
+        if sys.platform != "win32":
+            try:
+                import os
+                mode = os.stat(path).st_mode
+                if mode & 0o077:  # world or group readable
+                    warnings.warn(
+                        f"Key file {path} is readable by other users (mode {oct(mode)}). "
+                        f"Consider: chmod 600 {path}",
+                        stacklevel=2,
+                    )
+            except (OSError, AttributeError):
+                pass
 
     @property
     def dim(self) -> int:
@@ -459,8 +462,8 @@ class PrivateEncoder:
         safe_norms = np.maximum(rot_norms, 1e-10)
         unit_rotated = rotated / safe_norms[:, np.newaxis]
 
-        # Step 3: Compute codebook (same as TurboQuantVectors but for the rotated space)
-        codebook = _compute_codebook(self._dim, bits)
+        # Step 3: Compute codebook
+        codebook = compute_codebook(self._dim, bits)
         n_centroids = 2 ** bits
 
         # Step 4: Quantize — find nearest centroid per coordinate
@@ -487,31 +490,6 @@ class PrivateEncoder:
             f"PrivateEncoder(dim={self._dim}, normalize={self._normalize}, "
             f"key={self.fingerprint()})"
         )
-
-
-def _compute_codebook(dim: int, bits: int) -> np.ndarray:
-    """Optimal codebook for Gaussian-like distribution after rotation."""
-    import math
-    sigma = 1.0 / math.sqrt(dim)
-    if bits == 1:
-        c = math.sqrt(2.0 / (math.pi * dim))
-        return np.array([-c, c], dtype=np.float32)
-    elif bits == 2:
-        lloyd = [0.4528, 1.5104]
-    elif bits == 3:
-        lloyd = [0.1284, 0.3882, 0.6568, 0.9423]
-    elif bits == 4:
-        lloyd = [0.1284, 0.3882, 0.6568, 0.9423, 1.2562, 1.6180, 2.0690, 2.7326]
-    else:
-        n = 2 ** (bits - 1)
-        lloyd = [(i + 0.5) / n * 3.0 for i in range(n)]
-
-    centroids = []
-    for v in reversed(lloyd):
-        centroids.append(-v * sigma)
-    for v in lloyd:
-        centroids.append(v * sigma)
-    return np.array(centroids, dtype=np.float32)
 
 
 class CompressedPrivateVectors:

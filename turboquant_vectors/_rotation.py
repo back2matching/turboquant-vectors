@@ -1,11 +1,12 @@
 """
-Low-level rotation matrix operations.
+Low-level shared operations: rotation matrices and codebooks.
 
 Shared by both the privacy module (PrivateEncoder) and compression module (TurboQuantVectors).
 Generates random orthogonal matrices from the Haar measure on O(d) via QR decomposition.
 """
 
 import hashlib
+import math
 import numpy as np
 from typing import Optional
 
@@ -73,3 +74,32 @@ def validate_orthogonal(matrix: np.ndarray, tol: float = 1e-4) -> bool:
 def fingerprint(matrix: np.ndarray) -> str:
     """Compute a short hex fingerprint of a rotation matrix (first 16 chars of SHA-256)."""
     return hashlib.sha256(matrix.tobytes()).hexdigest()[:16]
+
+
+def compute_codebook(dim: int, bits: int) -> np.ndarray:
+    """
+    Optimal codebook for Gaussian-like distribution after rotation.
+
+    Uses Lloyd-Max optimal centroids for bits 1-4, uniform quantization for 5-8.
+    Shared by both TurboQuantVectors (compression) and PrivateEncoder (rotate_and_compress).
+    """
+    sigma = 1.0 / math.sqrt(dim)
+    if bits == 1:
+        c = math.sqrt(2.0 / (math.pi * dim))
+        return np.array([-c, c], dtype=np.float32)
+    elif bits == 2:
+        lloyd = [0.4528, 1.5104]
+    elif bits == 3:
+        lloyd = [0.1284, 0.3882, 0.6568, 0.9423]
+    elif bits == 4:
+        lloyd = [0.1284, 0.3882, 0.6568, 0.9423, 1.2562, 1.6180, 2.0690, 2.7326]
+    else:
+        n = 2 ** (bits - 1)
+        lloyd = [(i + 0.5) / n * 3.0 for i in range(n)]
+
+    centroids = []
+    for v in reversed(lloyd):
+        centroids.append(-v * sigma)
+    for v in lloyd:
+        centroids.append(v * sigma)
+    return np.array(centroids, dtype=np.float32)

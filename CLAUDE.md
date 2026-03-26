@@ -15,7 +15,7 @@ The privacy + compression layer for vector search. Two features:
 | Metric | Value |
 |--------|-------|
 | Version | 0.3.0 (PyPI) |
-| Tests | 92 |
+| Tests | 117 |
 | Dependencies | numpy only |
 | Python | >= 3.10 |
 
@@ -25,7 +25,7 @@ The privacy + compression layer for vector search. Two features:
 turboquant_vectors/
   __init__.py       — exports PrivateEncoder, CompressedPrivateVectors, compress, search
   private.py        — PrivateEncoder class (privacy via orthogonal rotation)
-  _rotation.py      — rotation matrix generation, HMAC seed derivation, validation
+  _rotation.py      — rotation matrix generation, HMAC seed derivation, validation, shared codebook
   core.py           — TurboQuantVectors compression engine
   cli.py            — CLI (compression only, no privacy commands yet)
 
@@ -34,6 +34,8 @@ tests/
   test_privacy_demo.py      — 11 tests: classifier attack, correlation, benchmarks
   test_compression_private.py — 12 tests: rotate_and_compress pipeline
   test_core.py              — 14 tests: core compression
+  test_core_extended.py     — 14 tests: input validation, all bit widths, save/load, codebook
+  test_cli.py               — 5 tests: CLI compress/search/info
   test_benchmark.py         — 3 tests: reproducibility
 
 demos/
@@ -55,7 +57,7 @@ docs/
 
 ```bash
 pip install -e .                    # Dev install
-python -m pytest tests/ -v         # Run all 92 tests
+python -m pytest tests/ -v         # Run all 117 tests
 python demos/inversion_demo.py     # Privacy demo (needs sentence-transformers)
 python benchmarks/real_data_benchmark.py  # Compression benchmark (needs faiss-cpu, datasets)
 python benchmarks/adversarial_self_test.py  # Self-attack test
