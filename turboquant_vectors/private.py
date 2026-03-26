@@ -340,6 +340,9 @@ class PrivateEncoder:
                 f"Expected vectors with dim={self._dim}, got shape {vectors.shape}"
             )
 
+        if not np.isfinite(vectors).all():
+            raise ValueError("Input contains NaN or inf values")
+
         # Inverse rotation: x = y @ Q
         result = vectors @ self._rotation
         result = np.ascontiguousarray(result)
@@ -373,6 +376,9 @@ class PrivateEncoder:
         single = vectors.ndim == 1
         if single:
             vectors = vectors[np.newaxis, :]
+
+        if not np.isfinite(vectors).all():
+            raise ValueError("Input contains NaN or inf values")
 
         # Combined rotation: Q_new @ Q_old^T applied via two matrix multiplies
         # y_new = x_rotated @ Q_old @ Q_new^T
@@ -552,17 +558,19 @@ class CompressedPrivateVectors:
         self,
         query: np.ndarray,
         top_k: int = 10,
-        metric: str = "cosine",
     ) -> tuple:
         """
-        Nearest-neighbor search on compressed vectors.
+        Cosine nearest-neighbor search on compressed vectors.
 
         The query MUST be rotated with the same PrivateEncoder.
+
+        Only cosine similarity is supported. IP and L2 metrics are not
+        valid on compressed rotated vectors because the decompressed data
+        has original norms applied in rotated space.
 
         Args:
             query: Rotated query vector, shape (d,) or (n_queries, d).
             top_k: Number of results.
-            metric: "cosine", "l2", or "ip".
 
         Returns:
             (indices, scores) arrays.
@@ -574,24 +582,11 @@ class CompressedPrivateVectors:
 
         decompressed = self._decompress()
 
-        if metric == "cosine":
-            q_norm = np.linalg.norm(query, axis=1, keepdims=True)
-            query_unit = query / np.maximum(q_norm, 1e-10)
-            d_norm = np.linalg.norm(decompressed, axis=1, keepdims=True)
-            data_unit = decompressed / np.maximum(d_norm, 1e-10)
-            scores = query_unit @ data_unit.T
-        elif metric == "ip":
-            scores = query @ decompressed.T
-        elif metric == "l2":
-            # L2 distance via ||a-b||^2 = ||a||^2 + ||b||^2 - 2<a,b>
-            # This is O(n_queries * n_vectors) memory, not O(n_q * n_v * dim)
-            q_sq = np.sum(query ** 2, axis=1, keepdims=True)  # (n_q, 1)
-            d_sq = np.sum(decompressed ** 2, axis=1)  # (n_v,)
-            dot = query @ decompressed.T  # (n_q, n_v)
-            sq_dists = q_sq + d_sq[np.newaxis, :] - 2 * dot
-            scores = -sq_dists  # Negate: higher = closer
-        else:
-            raise ValueError(f"Unknown metric: {metric}. Use 'cosine', 'l2', or 'ip'.")
+        q_norm = np.linalg.norm(query, axis=1, keepdims=True)
+        query_unit = query / np.maximum(q_norm, 1e-10)
+        d_norm = np.linalg.norm(decompressed, axis=1, keepdims=True)
+        data_unit = decompressed / np.maximum(d_norm, 1e-10)
+        scores = query_unit @ data_unit.T
 
         # Efficient top-k via argpartition (O(n) vs O(n log n) for argsort)
         n_vecs = scores.shape[1]

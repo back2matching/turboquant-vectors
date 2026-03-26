@@ -454,7 +454,7 @@ class TestPinnedOutput:
 
 
 class TestSearchMetrics:
-    """Cover search() with all metric types (ip, l2, cosine)."""
+    """Cover search() on CompressedPrivateVectors (cosine-only)."""
 
     def _make_compressed(self):
         enc = PrivateEncoder.generate(dim=64, normalize=False)
@@ -468,28 +468,16 @@ class TestSearchMetrics:
 
     def test_search_cosine(self):
         cpv, q = self._make_compressed()
-        idx, scores = cpv.search(q, top_k=5, metric="cosine")
+        idx, scores = cpv.search(q, top_k=5)
         assert idx.shape == (5,), f"Expected (5,), got {idx.shape}"
         assert scores.shape == (5,)
         assert scores[0] >= scores[-1]  # Sorted descending
 
-    def test_search_ip(self):
+    def test_search_returns_sorted_scores(self):
         cpv, q = self._make_compressed()
-        idx, scores = cpv.search(q, top_k=5, metric="ip")
-        assert idx.shape == (5,)
-        assert scores[0] >= scores[-1]
-
-    def test_search_l2(self):
-        cpv, q = self._make_compressed()
-        idx, scores = cpv.search(q, top_k=5, metric="l2")
-        assert idx.shape == (5,)
-        # L2 scores are negative squared distances, higher = closer
-        assert scores[0] >= scores[-1]
-
-    def test_search_unknown_metric(self):
-        cpv, q = self._make_compressed()
-        with pytest.raises(ValueError, match="Unknown metric"):
-            cpv.search(q, top_k=5, metric="hamming")
+        idx, scores = cpv.search(q, top_k=10)
+        for i in range(len(scores) - 1):
+            assert scores[i] >= scores[i + 1], "Scores should be descending"
 
     def test_search_topk_larger_than_n(self):
         """top_k > n_vectors should return all vectors without error."""
