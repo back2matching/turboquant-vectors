@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "turboquant-vectors"
 version = "0.3.1"
-description = "Compress and protect embeddings with TurboQuant. Zero-loss privacy via orthogonal rotation + 8x compression. No training needed."
+description = "Zero-loss embedding privacy via orthogonal rotation + compression. Defeats Vec2Text inversion. No training needed."
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.10"

@@ -158,7 +158,7 @@ compressed.save("private_index.npz")
 
 8x instant compression, no training needed.
 
-First open-source implementation of Google's TurboQuant ([ICLR 2026](https://arxiv.org/abs/2504.19874)) for vector search.
+Rotation + optimal scalar quantization inspired by Google's TurboQuant ([ICLR 2026](https://arxiv.org/abs/2504.19874)). Implements stage 1 (rotation + Lloyd-Max codebook); the paper's QJL residual correction is not yet implemented.
 
 ```python
 from turboquant_vectors import compress, search
@@ -169,7 +169,7 @@ indices, scores = search(compressed, query, top_k=10)
 
 ### Why
 
-FAISS Product Quantization requires k-means training per dataset. TurboQuant is instant (data-oblivious), compresses 2-2.5x faster, and gets up to +8pp better recall at the same storage budget.
+FAISS Product Quantization requires k-means training per dataset. This approach is instant (data-oblivious) and needs no training. On real OpenAI embeddings, it matches or slightly beats FAISS PQ at the same storage budget (+0.4 to +1.2pp recall@10).
 
 ### Benchmarks on real OpenAI embeddings (10K vectors, 1536-dim)
 
@@ -226,7 +226,7 @@ compressed.save(path) / .load(path)    # Persistence
 Zandieh, Daliri, Hadian, Mirrokni (Google Research)
 ICLR 2026 | [arXiv:2504.19874](https://arxiv.org/abs/2504.19874)
 
-Independent implementation, not affiliated with Google Research.
+Independent partial implementation (rotation + scalar quantization only, not the full QJL pipeline). Not affiliated with Google Research.
 
 ## License
 
