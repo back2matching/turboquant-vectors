@@ -159,6 +159,42 @@ class TestRotateAndCompressDimensionMismatch:
             enc.rotate_and_compress(vec, bits=4)
 
 
+class TestStochasticQuantization:
+    """Test stochastic (randomized rounding) quantization for DP."""
+
+    def test_stochastic_produces_different_results_each_call(self):
+        from turboquant_vectors.private import PrivateEncoder
+        enc = PrivateEncoder.generate(dim=64, normalize=False)
+        data = np.random.randn(100, 64).astype(np.float32)
+        data /= np.linalg.norm(data, axis=1, keepdims=True)
+        c1 = enc.rotate_and_compress(data, bits=4, stochastic=True)
+        c2 = enc.rotate_and_compress(data, bits=4, stochastic=True)
+        # Stochastic should produce slightly different indices each time
+        # (not guaranteed for every element, but overall they should differ)
+        assert not np.array_equal(c1.indices, c2.indices), \
+            "Stochastic quantization should produce different results on repeated calls"
+
+    def test_stochastic_still_searchable(self):
+        from turboquant_vectors.private import PrivateEncoder
+        enc = PrivateEncoder.generate(dim=64, normalize=False)
+        data = np.random.randn(200, 64).astype(np.float32)
+        data /= np.linalg.norm(data, axis=1, keepdims=True)
+        cpv = enc.rotate_and_compress(data, bits=4, stochastic=True)
+        query = enc.rotate(data[0], normalize=False)
+        idx, scores = cpv.search(query, top_k=5)
+        assert len(idx) == 5
+        assert scores[0] >= scores[-1]
+
+    def test_deterministic_is_default(self):
+        from turboquant_vectors.private import PrivateEncoder
+        enc = PrivateEncoder.generate(dim=64, normalize=False)
+        data = np.random.randn(50, 64).astype(np.float32)
+        data /= np.linalg.norm(data, axis=1, keepdims=True)
+        c1 = enc.rotate_and_compress(data, bits=4)
+        c2 = enc.rotate_and_compress(data, bits=4)
+        np.testing.assert_array_equal(c1.indices, c2.indices)
+
+
 class TestEmptyInput:
 
     def test_compress_empty(self):

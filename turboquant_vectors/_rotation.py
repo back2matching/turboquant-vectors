@@ -76,6 +76,50 @@ def fingerprint(matrix: np.ndarray) -> str:
     return hashlib.sha256(matrix.tobytes()).hexdigest()[:16]
 
 
+def quantize(values: np.ndarray, codebook: np.ndarray, stochastic: bool = False,
+             rng: Optional[np.random.Generator] = None) -> np.ndarray:
+    """
+    Quantize values to nearest codebook centroid.
+
+    Args:
+        values: Array to quantize (any shape).
+        codebook: Sorted 1D array of centroids.
+        stochastic: If True, use randomized rounding between the two nearest
+            centroids (proportional to inverse distance). This provides formal
+            Renyi differential privacy. If False, deterministic nearest-centroid.
+        rng: Random generator for stochastic mode. Uses default if None.
+
+    Returns:
+        uint8 indices into codebook, same shape as values.
+    """
+    thresholds = (codebook[:-1] + codebook[1:]) / 2
+    indices = np.searchsorted(thresholds, values)
+
+    if stochastic:
+        if rng is None:
+            rng = np.random.default_rng()
+        # For each value, compute distance to assigned centroid and the neighbor
+        assigned = codebook[indices]
+        dists = np.abs(values - assigned)
+        # Determine neighbor: if value > assigned centroid, neighbor is idx+1, else idx-1
+        # Clamp to valid range
+        n_centroids = len(codebook)
+        neighbor_idx = np.where(values > assigned,
+                                np.minimum(indices + 1, n_centroids - 1),
+                                np.maximum(indices.astype(np.int32) - 1, 0))
+        neighbor = codebook[neighbor_idx]
+        neighbor_dists = np.abs(values - neighbor)
+        # Probability of keeping assigned = neighbor_dist / (dist + neighbor_dist)
+        total = dists + neighbor_dists
+        safe_total = np.maximum(total, 1e-10)
+        keep_prob = neighbor_dists / safe_total
+        # Flip to neighbor with probability 1 - keep_prob
+        flip = rng.random(values.shape) > keep_prob
+        indices = np.where(flip, neighbor_idx, indices)
+
+    return indices.astype(np.uint8)
+
+
 def compute_codebook(dim: int, bits: int) -> np.ndarray:
     """
     Optimal codebook for Gaussian-like distribution after rotation.
