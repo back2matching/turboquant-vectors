@@ -1,13 +1,8 @@
 # turboquant-vectors
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/back2matching/turboquant-vectors/blob/main/notebooks/privacy_demo.ipynb)
 [![PyPI](https://img.shields.io/pypi/v/turboquant-vectors)](https://pypi.org/project/turboquant-vectors/)
 
-Compress and protect embeddings with TurboQuant.
-
-Two tools in one package:
-- **PrivateEncoder** -- rotate embeddings with a secret key. Search works identically. Inversion attacks fail.
-- **compress/search** -- 8x compression, no training needed, instant.
+Rotate your embeddings before storing them. Search still works. Inversion attacks fail. Also does compression.
 
 ```python
 from turboquant_vectors import PrivateEncoder
@@ -19,7 +14,7 @@ encoder.save_key("secret.tqkey")           # treat like an SSH key
 
 ## Embedding Privacy
 
-Vec2Text recovers 92% of original text from unprotected embeddings (32-token inputs, GTR-base encoder). ALGEN needs only 1,000 leaked pairs. OWASP lists this as LLM08 in their 2025 Top 10.
+Vec2Text can recover ~92% of original text from unprotected embeddings (32-token inputs, GTR-base encoder). ALGEN needs only 1,000 leaked pairs. OWASP lists this as LLM08 in their 2025 Top 10.
 
 PrivateEncoder applies a secret orthogonal rotation before you send embeddings to a third-party vector DB. The math:
 
@@ -53,18 +48,16 @@ encoder = PrivateEncoder.load_key("secret.tqkey")
 
 ### What it protects against
 
-- **Vec2Text** (92% text recovery from embeddings) -- fails completely on rotated vectors
+- **Vec2Text** (text recovery from embeddings) -- fails on rotated vectors
 - **ALGEN** (few-shot inversion with 1K pairs) -- fails without the rotation key
 - **ZSinvert / Zero2Text** (zero-shot inversion) -- fails on rotated embedding space
 - **Attribute classifiers** (age, sex, medical conditions from embeddings) -- drop to random chance
 
-Our demo proves it on real sentence-transformer embeddings across 5 sensitive categories (medical, financial, legal, personal, neutral): a classifier achieves 88.9% accuracy on originals but drops to 11.1% on rotated vectors (below 20% random chance). See `demos/inversion_demo.py`.
+A classifier achieves 88.9% accuracy distinguishing 5 sensitive categories on original embeddings but drops to 11.1% on rotated vectors (below 20% random chance). See `demos/inversion_demo.py`.
 
-We also tested the Wasserstein-Procrustes unsupervised alignment attack (the strongest known attack that doesn't require matched pairs). It fails completely: cosine recovery of 0.004, identical to a random guess. See `benchmarks/adversarial_self_test.py`.
+The Wasserstein-Procrustes unsupervised alignment attack (the strongest known attack without matched pairs) also fails: cosine recovery of 0.004, same as random. See `benchmarks/adversarial_self_test.py`.
 
 ### What it does NOT protect against
-
-Be honest about the threat model:
 
 - **Known-plaintext attack**: d original-rotated pairs (e.g., 1,536 for OpenAI embeddings) fully recovers the key via SVD. Don't let anyone see both the original AND rotated versions of the same content.
 - **Pairwise distances are visible**: The server can see which documents are similar to each other, cluster structure, and query patterns. It just can't read what any document says.
@@ -90,16 +83,6 @@ Even with rotation, the server can observe:
 
 The server CANNOT determine what any document says, infer PII, or run published inversion attacks.
 
-### Comparison with other approaches
-
-| Property | Rotation (ours) | Differential Privacy | Homomorphic Encryption | IronCore Cloaked AI |
-|----------|----------------|---------------------|----------------------|-------------------|
-| Search quality | Identical (lossless) | 5-30% recall loss | Identical | ~5% recall loss |
-| Latency overhead | <0.1ms per vector | Negligible | 1000-10000x | SDK overhead |
-| Deployment | One numpy matmul | Drop-in | Custom server | SDK + license |
-| License | Apache 2.0 | N/A | N/A | AGPL / $599+/mo |
-| Known-plaintext resistant | No (d pairs breaks it) | Yes | Yes | Partially |
-
 ### Key management
 
 Treat `.tqkey` files like SSH private keys:
@@ -108,7 +91,7 @@ Treat `.tqkey` files like SSH private keys:
 - Use `from_seed()` with a 128-bit seed to share keys without large files
 - Use `rekey_vectors()` to rotate to a new key without exposing originals
 
-### Benchmarks
+### Performance
 
 | Dimension | Single vector | Batch 10K | Key generation | Key file |
 |-----------|--------------|-----------|---------------|---------|
@@ -156,9 +139,9 @@ compressed.save("private_index.npz")
 
 ## Compression
 
-8x instant compression, no training needed.
+8x compression, no training needed.
 
-Rotation + optimal scalar quantization inspired by Google's TurboQuant ([ICLR 2026](https://arxiv.org/abs/2504.19874)). Implements stage 1 (rotation + Lloyd-Max codebook); the paper's QJL residual correction is not yet implemented.
+Rotation + scalar quantization inspired by TurboQuant (ICLR 2026). Implements stage 1 only (rotation + Lloyd-Max codebook); the paper's QJL residual correction is not implemented.
 
 ```python
 from turboquant_vectors import compress, search
@@ -169,19 +152,19 @@ indices, scores = search(compressed, query, top_k=10)
 
 ### Why
 
-FAISS Product Quantization requires k-means training per dataset. This approach is instant (data-oblivious) and needs no training. On real OpenAI embeddings, it matches or slightly beats FAISS PQ at the same storage budget (+0.4 to +1.2pp recall@10).
+FAISS Product Quantization requires k-means training per dataset. This approach is data-oblivious (no training) and works instantly. On real OpenAI embeddings, it matches or slightly beats FAISS PQ at the same storage budget.
 
 ### Benchmarks on real OpenAI embeddings (10K vectors, 1536-dim)
 
-Tested on Qdrant's `dbpedia-entities-openai3-text-embedding-3-small` dataset from HuggingFace. Real embeddings, not synthetic.
+Tested on Qdrant's `dbpedia-entities-openai3-text-embedding-3-small` dataset from HuggingFace.
 
 | Bits | TurboQuant Recall@10 | FAISS PQ Recall@10 | Delta | TQ Compress Time |
 |------|---------------------|-------------------|-------|-----------------|
-| 2-bit | **90.6%** | 90.2% | **+0.4pp** | 1.2s (no training) |
-| 4-bit | **96.6%** | 96.1% | **+0.5pp** | 1.7s (no training) |
-| 8-bit | **99.3%** | 98.1% | **+1.2pp** | 9.5s (no training) |
+| 2-bit | 90.6% | 90.2% | +0.4pp | 1.2s (no training) |
+| 4-bit | 96.6% | 96.1% | +0.5pp | 1.7s (no training) |
+| 8-bit | 99.3% | 98.1% | +1.2pp | 9.5s (no training) |
 
-TurboQuant needs zero training (data-oblivious). FAISS PQ requires k-means training. Reproduce: `python benchmarks/real_data_benchmark.py`
+Reproduce: `python benchmarks/real_data_benchmark.py`
 
 ---
 
@@ -220,13 +203,23 @@ search(compressed, query, top_k=10)    # Search compressed vectors
 compressed.save(path) / .load(path)    # Persistence
 ```
 
+## CLI
+
+```bash
+tq-vectors keygen  --dim 1536 -o secret.tqkey
+tq-vectors rotate  --key secret.tqkey embeddings.npy -o rotated.npy
+tq-vectors keyinfo secret.tqkey
+tq-vectors verify  --key secret.tqkey --index data.tqv.npz
+tq-vectors compress embeddings.npy -b 4 -o compressed.tqv.npz
+```
+
 ## Paper
 
 **TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate**
 Zandieh, Daliri, Hadian, Mirrokni (Google Research)
 ICLR 2026 | [arXiv:2504.19874](https://arxiv.org/abs/2504.19874)
 
-Independent partial implementation (rotation + scalar quantization only, not the full QJL pipeline). Not affiliated with Google Research.
+This is an independent partial implementation (rotation + scalar quantization only, not the full QJL pipeline). Not affiliated with Google Research.
 
 ## License
 
