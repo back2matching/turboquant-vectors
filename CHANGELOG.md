@@ -2,9 +2,11 @@
 
 All notable changes to turboquant-vectors.
 
-## [Unreleased] (dev branch)
+## [0.3.1] - 2026-03-25
 
 ### Fixed
+- **CRITICAL**: 3-bit codebook was completely wrong — used inner 4 values of 4-bit codebook instead of correct 8-level Lloyd-Max centroids (~6x worse MSE). Fixed with scipy-verified values.
+- 4-bit codebook updated to higher-precision Lloyd-Max values
 - `CompressedPrivateVectors.search()` now cosine-only (IP/L2 metrics removed — they produced incorrect results on compressed rotated data)
 - `unrotate()` and `rekey_vectors()` now validate for NaN/inf input
 - `TurboQuantVectors` rejects `bits` outside 1-8 and `dim < 1`

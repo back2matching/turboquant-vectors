@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "turboquant-vectors"
-version = "0.3.0"
+version = "0.3.1"
 description = "Compress and protect embeddings with TurboQuant. Zero-loss privacy via orthogonal rotation + 8x compression. No training needed."
 readme = "README.md"
 license = {text = "Apache-2.0"}

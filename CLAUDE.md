@@ -14,8 +14,8 @@ The privacy + compression layer for vector search. Two features:
 
 | Metric | Value |
 |--------|-------|
-| Version | 0.3.0 (PyPI) |
-| Tests | 123 |
+| Version | 0.3.1 (dev, ready for PyPI) |
+| Tests | 121 |
 | Dependencies | numpy only |
 | Python | >= 3.10 |
 
