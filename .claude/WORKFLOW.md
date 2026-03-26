@@ -6,7 +6,7 @@
 
 **Last updated:** 2026-03-25
 **Branch:** dev
-**Tests:** 128 passing, 8.6s
+**Tests:** 132 passing, 8.9s
 
 ---
 
@@ -24,10 +24,10 @@
 
 > Focus on the ONE thing that gets real users: LangChain integration.
 
-- [x] B1. Create `turboquant_vectors/adapters/langchain_adapter.py` — `PrivateEmbeddings(Embeddings)` wrapper that applies rotation to any base embeddings class. This is the 10,000x eyeballs play.
-- [ ] B2. Create `turboquant_vectors/_types.py` — `DimensionError`, `KeyMismatchError` with helpful messages. Architecture agent designed these.
-- [ ] B3. Add `keygen` and `rotate` CLI commands — make the privacy workflow first-class from command line.
-- [ ] B4. Add `py.typed` marker — type safety for downstream users.
+- [x] B1. Create `turboquant_vectors/adapters/langchain_adapter.py` — done, 4 tests — `PrivateEmbeddings(Embeddings)` wrapper that applies rotation to any base embeddings class. This is the 10,000x eyeballs play.
+- [x] B2. Create `turboquant_vectors/_types.py` — done, DimensionError + KeyMismatchError + VectorIndex — `DimensionError`, `KeyMismatchError` with helpful messages. Architecture agent designed these.
+- [x] B3. Add `keygen`, `rotate`, `keyinfo`, `verify` CLI commands — done, 4 tests — make the privacy workflow first-class from command line.
+- [x] B4. Add `py.typed` marker — done — type safety for downstream users.
 
 ## Phase C: Credibility
 
