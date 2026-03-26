@@ -6,7 +6,7 @@
 
 **Last updated:** 2026-03-25
 **Branch:** dev
-**Tests:** 124 passing, 7.8s
+**Tests:** 128 passing, 8.6s
 
 ---
 
@@ -24,7 +24,7 @@
 
 > Focus on the ONE thing that gets real users: LangChain integration.
 
-- [ ] B1. Create `turboquant_vectors/adapters/langchain_adapter.py` — `PrivateEmbeddings(Embeddings)` wrapper that applies rotation to any base embeddings class. This is the 10,000x eyeballs play.
+- [x] B1. Create `turboquant_vectors/adapters/langchain_adapter.py` — `PrivateEmbeddings(Embeddings)` wrapper that applies rotation to any base embeddings class. This is the 10,000x eyeballs play.
 - [ ] B2. Create `turboquant_vectors/_types.py` — `DimensionError`, `KeyMismatchError` with helpful messages. Architecture agent designed these.
 - [ ] B3. Add `keygen` and `rotate` CLI commands — make the privacy workflow first-class from command line.
 - [ ] B4. Add `py.typed` marker — type safety for downstream users.
@@ -41,7 +41,7 @@
 
 > Only after the above is solid.
 
-- [ ] D1. Publish 0.3.1 to PyPI (needs credentials — document the exact command)
+- [ ] D1. Publish 0.3.1 to PyPI — BLOCKED: no .pypirc, no keyring token, Playwright MCP disconnected. User needs to run: `python -m twine upload dist/turboquant_vectors-0.3.1*` or set up ~/.pypirc with API token first.
 - [ ] D2. Submit LangChain PR (once B1 is tested)
 - [ ] D3. Write one Hacker News comment in the existing TurboQuant thread explaining the privacy angle (not a Show HN — a relevant comment)
 
