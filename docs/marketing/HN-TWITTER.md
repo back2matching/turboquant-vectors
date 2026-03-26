@@ -18,7 +18,7 @@ Orthogonal rotation preserves ALL distance metrics exactly (it's a mathematical 
     encoder = PrivateEncoder.generate(dim=1536)
     rotated = encoder.rotate(embeddings)
 
-92 tests proving: Recall@10 = 1.000 exactly, classifier attacks drop from 100% to 0%, round-trip error < 1e-5.
+121 tests proving: Recall@10 = 1.000 exactly, classifier attacks drop from 100% to 0%, round-trip error < 1e-5.
 
 Known weakness (documented honestly): d original-to-rotated pairs recovers the key via SVD. This is a privacy layer for honest-but-curious storage providers, not cryptographic encryption.
 
@@ -50,7 +50,7 @@ encoder = PrivateEncoder.generate(dim=1536)
 rotated = encoder.rotate(embeddings)
 ```
 
-**5/7** We tested it properly. 92 tests:
+**5/7** We tested it properly. 121 tests:
 - Classifier trained on originals: 100% accuracy
 - Same classifier on rotated vectors: 0%
 - Recall@10: exactly 1.000 (20/20 queries on 10K vectors)

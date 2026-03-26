@@ -1,5 +1,8 @@
 # turboquant-vectors
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/back2matching/turboquant-vectors/blob/main/notebooks/privacy_demo.ipynb)
+[![PyPI](https://img.shields.io/pypi/v/turboquant-vectors)](https://pypi.org/project/turboquant-vectors/)
+
 Compress and protect embeddings with TurboQuant.
 
 Two tools in one package:

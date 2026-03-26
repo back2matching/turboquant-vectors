@@ -35,7 +35,7 @@ rotated = encoder.rotate(embeddings)
 - The server can still see which documents are similar to each other (pairwise distances preserved)
 - This is NOT encryption and NOT differential privacy
 
-**Benchmarks (92 tests, all passing):**
+**Benchmarks (121 tests, all passing):**
 - Single vector rotation: 0.11ms at d=1536
 - Batch 10K: 88ms
 - Key generation: 465ms (one-time)
@@ -56,7 +56,7 @@ Happy to answer questions about the math, the threat model, or the known-plainte
 
 ## r/MachineLearning
 
-**Title:** [P] Zero-loss embedding privacy via orthogonal rotation — first pip package, 92 tests, honest threat model
+**Title:** [P] Zero-loss embedding privacy via orthogonal rotation — first pip package, 121 tests, honest threat model
 
 **Body:**
 
@@ -76,7 +76,7 @@ rotated = encoder.rotate(embeddings)  # search results are identical
 encoder.save_key("secret.tqkey")      # treat like an SSH key
 ```
 
-**What we prove (92 tests):**
+**What we prove (121 tests):**
 - Recall@10 = 1.000 exactly (brute-force verification on 10K vectors)
 - Classifier transfer attack: accuracy drops from 100% to 0% on rotated vectors
 - Per-dimension Pearson r between original and rotated ~ sqrt(2/pi*d) (matches theory for Haar-random orthogonal matrices)
