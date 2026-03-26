@@ -50,7 +50,9 @@ benchmarks/
 docs/
   research/     — threat model, API spec, landscape, integrations, benchmarks
   marketing/    — launch plan, Reddit posts, HN/Twitter drafts
-  plans/        — ExecPlan (PLAN-private-embeddings.md)
+  plans/
+    EXECPLAN.md — ACTIVE plan (0.4 roadmap: marketing, harden, credibility, features)
+    PLAN-private-embeddings.md — completed plan (0.1-0.3)
 ```
 
 ## Commands

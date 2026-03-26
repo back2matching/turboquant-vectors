@@ -9,15 +9,27 @@ docs/
 │   ├── EMBEDDING-INVERSION-THREAT-MODEL.md      — attack/defense analysis
 │   ├── PRIVACY-PRESERVING-EMBEDDINGS-LANDSCAPE.md — competitive landscape
 │   ├── PRIVATE-ENCODER-INTEGRATIONS.md          — 7 DBs + 5 pipeline integrations
-│   └── TURBOQUANT-VECTORS-REAL-BENCHMARKS.md    — benchmark design
-├── marketing/         — launch materials
+│   ├── TURBOQUANT-VECTORS-REAL-BENCHMARKS.md    — benchmark design
+│   ├── TURBOQUANT-NEXT-MOVES.md                 — ecosystem strategy (from FlockRun)
+│   └── TURBOQUANT-COMBINATIONS.md               — technique combination analysis
+├── marketing/         — launch materials (dev-only, not on main)
 │   ├── LAUNCH-PLAN.md — sequence, timing, platforms
 │   ├── REDDIT-POSTS.md — draft posts for r/LocalLLaMA, r/MachineLearning
 │   └── HN-TWITTER.md  — HN submission + Twitter thread
-└── plans/             — execution plans
-    └── PLAN-private-embeddings.md — ExecPlan (Phases 1-8, all complete)
+└── plans/
+    ├── EXECPLAN.md                — ACTIVE plan (0.4 roadmap)
+    ├── PLAN-private-embeddings.md — completed plan (0.1-0.3)
+    └── archive/                   — historical plans from FlockRun
 ```
+
+## Active Plan
+
+**[EXECPLAN.md](plans/EXECPLAN.md)** — the current forward-looking plan. Four phases:
+- **A: Launch Marketing** (this week — TurboQuant trending)
+- **B: Harden for 0.3.1** (this week)
+- **C: Credibility** (next 2 weeks — SIFT1M, VIBE, blog)
+- **D: 0.4 Features** (next month — CLI privacy, strict mode, LangChain)
 
 ## Research originated in FlockRun
 
-This project started as research in the FlockRun repo. The high-level TurboQuant ecosystem strategy (8 ideas, ranked) lives at `FlockRun/docs/research/TURBOQUANT-NEXT-MOVES.md`. This repo has the turboquant-vectors-specific docs.
+This project started as research in the FlockRun repo. The high-level TurboQuant ecosystem strategy (8 ideas, ranked) lives at `FlockRun/docs/research/TURBOQUANT-NEXT-MOVES.md` and is mirrored here at `research/TURBOQUANT-NEXT-MOVES.md`.

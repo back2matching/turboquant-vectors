@@ -24,9 +24,15 @@
 
 ---
 
-## Remaining (Phase 8)
+## Status: COMPLETED
 
-### Phase 8: Colab Notebook — STILL TODO
+All phases 1-7 shipped in 0.3.0. Phase 8 (Colab notebook) moved to the active plan: [EXECPLAN.md](EXECPLAN.md).
+
+This plan is now archived. The active forward-looking plan is **[EXECPLAN.md](EXECPLAN.md)**.
+
+---
+
+## Historical Phase Details (for reference)
 
 ### Phase 5: Vec2Text Inversion Demo (1-2 days) — THE KILLER PROOF
 
