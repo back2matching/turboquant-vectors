@@ -88,11 +88,15 @@ def compute_codebook(dim: int, bits: int) -> np.ndarray:
         c = math.sqrt(2.0 / (math.pi * dim))
         return np.array([-c, c], dtype=np.float32)
     elif bits == 2:
+        # Lloyd-Max optimal centroids for N(0,1), 4 levels
         lloyd = [0.4528, 1.5104]
     elif bits == 3:
-        lloyd = [0.1284, 0.3882, 0.6568, 0.9423]
+        # Lloyd-Max optimal centroids for N(0,1), 8 levels
+        # BUG FIX: was [0.1284, 0.3882, 0.6568, 0.9423] (inner 4-bit values, ~6x worse MSE)
+        lloyd = [0.2451, 0.7560, 1.3439, 2.1519]
     elif bits == 4:
-        lloyd = [0.1284, 0.3882, 0.6568, 0.9423, 1.2562, 1.6180, 2.0690, 2.7326]
+        # Lloyd-Max optimal centroids for N(0,1), 16 levels
+        lloyd = [0.1304, 0.3939, 0.6661, 0.9545, 1.2703, 1.6330, 2.0837, 2.7456]
     else:
         n = 2 ** (bits - 1)
         lloyd = [(i + 0.5) / n * 3.0 for i in range(n)]

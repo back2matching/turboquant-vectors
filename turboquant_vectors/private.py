@@ -472,15 +472,10 @@ class PrivateEncoder:
         codebook = compute_codebook(self._dim, bits)
         n_centroids = 2 ** bits
 
-        # Step 4: Quantize — find nearest centroid per coordinate
-        n = vectors.shape[0]
-        batch_size = max(1, min(10000, 500_000_000 // (self._dim * n_centroids * 4)))
-        indices = np.empty((n, self._dim), dtype=np.uint8)
-        for start in range(0, n, batch_size):
-            end = min(start + batch_size, n)
-            batch = unit_rotated[start:end]
-            dists = np.abs(batch[:, :, np.newaxis] - codebook[np.newaxis, np.newaxis, :])
-            indices[start:end] = dists.argmin(axis=2).astype(np.uint8)
+        # Step 4: Quantize — find nearest centroid per coordinate.
+        # searchsorted on midpoint thresholds is O(n*d*bits) vs O(n*d*2^bits)
+        thresholds = (codebook[:-1] + codebook[1:]) / 2
+        indices = np.searchsorted(thresholds, unit_rotated).astype(np.uint8)
 
         return CompressedPrivateVectors(
             indices=indices,

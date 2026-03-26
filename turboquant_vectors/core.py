@@ -133,14 +133,11 @@ class TurboQuantVectors:
         # Rotate: y = x @ rotation_t (batch matrix multiply)
         rotated = unit_vectors @ self.rotation_t
 
-        # Quantize: find nearest centroid per coordinate (batched to avoid OOM)
-        batch_size = max(1, min(10000, 500_000_000 // (self.dim * self.n_centroids * 4)))
-        indices = np.empty((n, self.dim), dtype=np.uint8)
-        for start in range(0, n, batch_size):
-            end = min(start + batch_size, n)
-            batch = rotated[start:end]
-            dists = np.abs(batch[:, :, np.newaxis] - self.codebook[np.newaxis, np.newaxis, :])
-            indices[start:end] = dists.argmin(axis=2).astype(np.uint8)
+        # Quantize: find nearest centroid per coordinate.
+        # Use searchsorted on midpoint thresholds — O(n*d*log(2^bits)) vs O(n*d*2^bits)
+        # for the old argmin approach. Also avoids the huge 3D distance tensor.
+        thresholds = (self.codebook[:-1] + self.codebook[1:]) / 2
+        indices = np.searchsorted(thresholds, rotated).astype(np.uint8)
 
         return CompressedVectors(
             indices=indices,
