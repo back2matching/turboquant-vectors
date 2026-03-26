@@ -86,7 +86,12 @@ class TurboQuantVectors:
         self.bits = bits
         self.n_centroids = 2 ** bits
 
-        # Generate random orthogonal rotation via QR decomposition
+        # Generate random orthogonal rotation via QR decomposition.
+        # MUST remain RandomState (legacy API), not default_rng.
+        # Changing RNG would produce different rotation matrices for the same seed,
+        # breaking reproducibility of existing compressed indexes.
+        # CompressedVectors stores the rotation in .npz files, so this only
+        # affects users who rely on deterministic seed-based reconstruction.
         rng = np.random.RandomState(seed)
         gaussian = rng.randn(dim, dim).astype(np.float32)
         Q, R = np.linalg.qr(gaussian)
