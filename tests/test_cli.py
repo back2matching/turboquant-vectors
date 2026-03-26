@@ -98,6 +98,52 @@ class TestCLISearch:
             query_path.unlink(missing_ok=True)
 
 
+class TestCLIKeygen:
+
+    def test_keygen_creates_key(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            keypath = str(Path(tmpdir) / "test.tqkey")
+            result = run_cli("keygen", keypath, "-d", "64")
+            assert result.returncode == 0, result.stderr
+            assert Path(keypath).exists()
+            assert "Fingerprint" in result.stdout
+
+    def test_keygen_from_seed(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            keypath = str(Path(tmpdir) / "seed.tqkey")
+            seed = str(2**64 + 1)
+            result = run_cli("keygen", keypath, "-d", "32", "--from-seed", seed)
+            assert result.returncode == 0, result.stderr
+            assert "deterministic" in result.stdout.lower()
+
+
+class TestCLIRotate:
+
+    def test_rotate_creates_output(self, sample_vectors):
+        path, _ = sample_vectors
+        with tempfile.TemporaryDirectory() as tmpdir:
+            keypath = str(Path(tmpdir) / "key.tqkey")
+            outpath = str(Path(tmpdir) / "rotated.npy")
+            run_cli("keygen", keypath, "-d", "64")
+            result = run_cli("rotate", str(path), "-k", keypath, "-o", outpath)
+            assert result.returncode == 0, result.stderr
+            assert Path(outpath).exists()
+            rotated = np.load(outpath)
+            assert rotated.shape == (100, 64)
+
+
+class TestCLIKeyinfo:
+
+    def test_keyinfo_shows_dim(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            keypath = str(Path(tmpdir) / "info.tqkey")
+            run_cli("keygen", keypath, "-d", "128")
+            result = run_cli("keyinfo", keypath)
+            assert result.returncode == 0, result.stderr
+            assert "128" in result.stdout
+            assert "Fingerprint" in result.stdout
+
+
 class TestCLIHelp:
 
     def test_no_args_shows_help(self):
