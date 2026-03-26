@@ -64,9 +64,11 @@ core.py uses deprecated `np.random.RandomState`, _rotation.py uses `np.random.de
 **Severity:** Low
 When `self._normalize=True`, `rotate()` already unit-normalizes. The second normalization in `rotate_and_compress` is redundant. Harmless but wastes a `linalg.norm` pass.
 
-### C5. 4-bit codebook reuses 3-bit inner Lloyd values
-**Severity:** Low
-True Lloyd-Max centroids for 16-level Gaussian differ from extending the 8-level ones. May slightly reduce 4-bit quality vs optimal. Inherited from TurboQuant paper implementation.
+### ~~C5. 3-bit codebook was completely wrong~~ ✅ FIXED (CRITICAL)
+3-bit codebook used inner 4 values of the 4-bit codebook instead of correct 8-level Lloyd-Max centroids. ~6x worse MSE. Fixed with scipy-verified values. 4-bit also updated to higher-precision values.
+
+### ~~C6. Quantization used O(n*d*2^bits) argmin on 3D tensor~~ ✅ FIXED
+Replaced with O(n*d*bits) searchsorted on midpoint thresholds. 18% test suite speedup, eliminates huge memory allocation.
 
 ---
 
