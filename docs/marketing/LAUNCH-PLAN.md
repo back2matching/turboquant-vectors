@@ -1,8 +1,8 @@
 # turboquant-vectors Launch Plan
 
-> Announce the PrivateEncoder privacy module. Published as 0.2.2. Ready to post.
+> Announce the PrivateEncoder privacy module. Published as 0.3.0. Ready to post.
 
-**Package:** https://pypi.org/project/turboquant-vectors/0.2.2/
+**Package:** https://pypi.org/project/turboquant-vectors/0.3.0/
 **GitHub:** https://github.com/back2matching/turboquant-vectors
 **What's new:** `PrivateEncoder` — zero-loss embedding privacy via orthogonal rotation
 
@@ -12,7 +12,7 @@
 
 | Day | Platform | Action |
 |-----|----------|--------|
-| 1 | PyPI | Already published (0.2.2) |
+| 1 | PyPI | Already published (0.3.0) |
 | 1 | GitHub | README updated, pushed |
 | 2 | r/LocalLLaMA | Main post (see REDDIT-POSTS.md) |
 | 2 | r/MachineLearning | Academic angle post |

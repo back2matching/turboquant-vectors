@@ -16,7 +16,7 @@ The privacy + compression layer for vector search. Two features:
 |--------|-------|
 | Version | 0.3.0 (PyPI) |
 | Tests | 92 |
-| Dependencies | numpy only (scipy lazy for compress) |
+| Dependencies | numpy only |
 | Python | >= 3.10 |
 
 ## Key Files

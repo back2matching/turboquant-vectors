@@ -3,10 +3,9 @@
 > Technical spec for the `PrivateEncoder` module. Uses TurboQuant's random orthogonal rotation as a lossless, secret-key obfuscation layer for embedding vectors.
 
 **Date:** 2026-03-25
-**Status:** Research complete, ready for implementation
+**Status:** Implemented and published (turboquant-vectors 0.3.0 on PyPI)
 **Package:** `turboquant_vectors.private` (submodule of turboquant-vectors)
-**Effort:** 3-5 days
-**Dependencies:** numpy, scipy (optional: torch for GPU acceleration)
+**Dependencies:** numpy only
 
 ---
 

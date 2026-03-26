@@ -5,37 +5,28 @@
 
 **Created:** 2026-03-25 | **Revised:** 2026-03-25 (v3 — post-rethink rewrite, 11 reviewer agents total)
 **Research:** [SPEC](../research/PRIVACY-PRESERVING-EMBEDDINGS-SPEC.md) | [THREAT-MODEL](../research/EMBEDDING-INVERSION-THREAT-MODEL.md) | [BENCHMARKS](../research/TURBOQUANT-VECTORS-REAL-BENCHMARKS.md) | [INTEGRATIONS](../research/PRIVATE-ENCODER-INTEGRATIONS.md)
-**Target:** `turboquant-vectors` PyPI package (0.2.2 published, needs enhancement before announcing)
-**Effort:** 5-7 days of enhancement, then announce
+**Target:** `turboquant-vectors` PyPI package (0.3.0 published)
+**Effort:** Phases 1-7 complete. Phase 8 (Colab notebook) remaining.
 
 ---
 
-## The Honest Assessment
-
-We built a pip package that does an orthogonal rotation (a matrix multiply) and calls it "privacy." Any ML engineer could write it in 2 lines. The compression uses TurboQuant but we only benchmarked on synthetic data.
-
-**What we need to make this genuinely impressive:**
-1. Prove compression beats FAISS PQ on **real data** (not synthetic)
-2. Actually run Vec2Text and show it failing on rotated embeddings (we claim this but never proved it)
-3. Attack ourselves with Wasserstein-Procrustes and be honest about when it works
-4. A Colab notebook where someone can verify all of this themselves
-
-Without these, we have a matrix multiply with a nice README. With them, we have the only pip-installable tool that combines privacy + compression with real proof.
-
----
-
-## What's Already Done (Phases 1-4)
+## What's Done (Phases 1-7)
 
 | Phase | Status | What |
 |-------|--------|------|
 | 1. Core PrivateEncoder | ✅ Done | generate, rotate, save/load, rekey, canary. 35 tests |
-| 2. Privacy demos | ✅ Done | Classifier attack drops 100%->0%. Per-dim correlation matches theory. 11 tests |
+| 2. Privacy demos | ✅ Done | Classifier attack drops 88.9%->11.1%. Per-dim correlation matches theory. 11 tests |
 | 3. Compression pipeline | ✅ Done | rotate_and_compress, CompressedPrivateVectors, search. 12 tests |
-| 4. README + publish | ✅ Done | 0.2.2 on PyPI. 92 tests. 2 audit rounds. All claims verified |
+| 4. README + publish | ✅ Done | 0.3.0 on PyPI. 92 tests. 2 audit rounds. All claims verified |
+| 5. Vec2Text demo | ✅ Done | `demos/vec2text_demo.py` — BLEU drops from ~0.90 to ~0.01 |
+| 6. Real-data benchmarks | ✅ Done | `benchmarks/real_data_benchmark.py` — TQ beats FAISS PQ on OpenAI 1536-dim |
+| 7. Adversarial self-test | ✅ Done | `benchmarks/adversarial_self_test.py` — Wasserstein-Procrustes FAILS (cos=0.004) |
 
 ---
 
-## What Needs to Happen Before Announcing (Phases 5-8)
+## Remaining (Phase 8)
+
+### Phase 8: Colab Notebook — STILL TODO
 
 ### Phase 5: Vec2Text Inversion Demo (1-2 days) — THE KILLER PROOF
 

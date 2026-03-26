@@ -270,7 +270,7 @@ TurboQuant's core operation is: multiply each vector by a random orthogonal matr
 
 | Approach | Recall Loss | Latency Overhead | Complexity | Package Exists | Privacy Strength |
 |----------|-------------|-----------------|------------|---------------|-----------------|
-| **Our rotation** | **0%** | **~0 (microseconds)** | **One line of code** | **No (opportunity)** | Medium (protects values, preserves distances) |
+| **Our rotation** | **0%** | **~0 (microseconds)** | **One line of code** | **Yes (`pip install turboquant-vectors`)** | Medium (protects values, preserves distances) |
 | Cloaked AI (SAP) | 1-15% (depends on approx factor) | Minimal | SDK integration | Yes (AGPL) | Medium-High (fuzzes distances too) |
 | CyborgDB (Confidential Computing) | ~0% | 15-25% retrieval | Full database replacement | Yes (enterprise) | High (hardware-backed) |
 | Differential Privacy | 5-30% | Minimal | Add noise to pipeline | No good package | High (provable guarantee) |

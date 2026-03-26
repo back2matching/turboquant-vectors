@@ -3,7 +3,7 @@
 > What datasets, metrics, protocols, and privacy demos we need to graduate from synthetic benchmarks to credible real-world claims.
 
 **Date:** 2026-03-25
-**Current state:** 0.2.2 on PyPI with synthetic-only benchmarks (+8pp at 4-bit, +7.1pp at 2-bit vs FAISS PQ, matched storage). Nobody cares about synthetic data.
+**Current state:** 0.3.0 on PyPI. Real-data benchmarks shipped (`benchmarks/real_data_benchmark.py`). TQ beats FAISS PQ on 10K OpenAI embeddings at 2/4/8-bit.
 
 ---
 
