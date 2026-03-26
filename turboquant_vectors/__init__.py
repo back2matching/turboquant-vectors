@@ -14,7 +14,7 @@ Privacy:
     rotated = encoder.rotate(embeddings)  # search works identically
 """
 
-__version__ = "0.2.2"
+__version__ = "0.3.0"
 
 from turboquant_vectors.core import compress, decompress, search, TurboQuantVectors
 from turboquant_vectors.private import PrivateEncoder, CompressedPrivateVectors

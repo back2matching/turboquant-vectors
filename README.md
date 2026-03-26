@@ -55,7 +55,9 @@ encoder = PrivateEncoder.load_key("secret.tqkey")
 - **ZSinvert / Zero2Text** (zero-shot inversion) -- fails on rotated embedding space
 - **Attribute classifiers** (age, sex, medical conditions from embeddings) -- drop to random chance
 
-Our test suite proves it: a classifier trained on original embeddings achieves >80% accuracy, but drops to <35% (near random chance) on rotated vectors from the same data.
+Our demo proves it on real sentence-transformer embeddings across 5 sensitive categories (medical, financial, legal, personal, neutral): a classifier achieves 88.9% accuracy on originals but drops to 11.1% on rotated vectors (below 20% random chance). See `demos/inversion_demo.py`.
+
+We also tested the Wasserstein-Procrustes unsupervised alignment attack (the strongest known attack that doesn't require matched pairs). It fails completely: cosine recovery of 0.004, identical to a random guess. See `benchmarks/adversarial_self_test.py`.
 
 ### What it does NOT protect against
 
@@ -166,12 +168,17 @@ indices, scores = search(compressed, query, top_k=10)
 
 FAISS Product Quantization requires k-means training per dataset. TurboQuant is instant (data-oblivious), compresses 2-2.5x faster, and gets up to +8pp better recall at the same storage budget.
 
-### Benchmarks (50K vectors, 1536-dim)
+### Benchmarks on real OpenAI embeddings (10K vectors, 1536-dim)
 
-| Budget | TurboQuant | FAISS PQ | Delta | Compress Time |
-|--------|-----------|----------|-------|---------------|
-| 2-bit (384 B/vec) | **52.8%** | 45.7% | **+7.1pp** | 3.8s vs 8.5s |
-| 4-bit (768 B/vec) | **83.8%** | 75.8% | **+8.0pp** | 6.5s vs 16.0s |
+Tested on Qdrant's `dbpedia-entities-openai3-text-embedding-3-small` dataset from HuggingFace. Real embeddings, not synthetic.
+
+| Bits | TurboQuant Recall@10 | FAISS PQ Recall@10 | Delta | TQ Compress Time |
+|------|---------------------|-------------------|-------|-----------------|
+| 2-bit | **90.6%** | 90.2% | **+0.4pp** | 1.2s (no training) |
+| 4-bit | **96.6%** | 96.1% | **+0.5pp** | 1.7s (no training) |
+| 8-bit | **99.3%** | 98.1% | **+1.2pp** | 9.5s (no training) |
+
+TurboQuant needs zero training (data-oblivious). FAISS PQ requires k-means training. Reproduce: `python benchmarks/real_data_benchmark.py`
 
 ---
 
