@@ -37,7 +37,7 @@ Zero-loss embedding privacy via orthogonal rotation, with optional compression. 
 | Metric | Value |
 |--------|-------|
 | Version | 0.3.1 (dev, ready for PyPI) |
-| Tests | 124 |
+| Tests | 132 |
 | Dependencies | numpy only |
 | Python | >= 3.10 |
 | Users | 0 (as of 2026-03-25) |
