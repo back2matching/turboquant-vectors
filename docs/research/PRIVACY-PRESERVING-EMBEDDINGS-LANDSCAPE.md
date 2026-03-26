@@ -446,6 +446,8 @@ protected_embeddings = rotate(embeddings, key)
 - [ALGEN: Few-shot Inversion Attacks on Textual Embeddings (2025)](https://arxiv.org/abs/2502.11308)
 - [Universal Zero-shot Embedding Inversion (ZSinvert, 2025)](https://arxiv.org/html/2504.00147v1)
 - [Generative Embedding Inversion Attacks (SIGIR 2025)](https://dl.acm.org/doi/10.1145/3726302.3730303)
+- [Conditional Masked Diffusion for Embedding Inversion (Jina AI, Feb 2026)](https://arxiv.org/abs/2602.11047)
+- [Rethinking the Privacy of Text Embeddings: Reproducibility Study (RecSys 2025)](https://arxiv.org/abs/2507.07700)
 - [Vector Embeddings Are Not One-Way Hashes (Cyborg)](https://www.cyborg.co/blog/vector-embeddings-are-not-one-way-hashes)
 - [Text Embedding Privacy Risks (IronCore Labs)](https://ironcorelabs.com/blog/2024/text-embedding-privacy-risks/)
 
@@ -488,6 +490,12 @@ protected_embeddings = rotate(embeddings, key)
 - [NVDP: Differential Privacy for Transformer Embeddings (ICLR 2026)](https://arxiv.org/html/2601.02307)
 - [JL Transform Preserves Differential Privacy (Blocki et al.)](https://www.researchgate.net/publication/223130068_The_Johnson-Lindenstrauss_Transform_Itself_Preserves_DifferentialPrivacy)
 - [LSH with Extended Differential Privacy (ESORICS 2021)](https://arxiv.org/abs/2010.09393)
+
+### Quantization Research (2025-2026)
+- [RaBitQ: Quantizing High-Dimensional Vectors with a Theoretical Error Bound (SIGMOD 2024)](https://dl.acm.org/doi/pdf/10.1145/3654970)
+- [Extended-RaBitQ: Multi-bit Generalization (SIGMOD 2025)](https://github.com/VectorDB-NTU/Extended-RaBitQ)
+- [SAQ: 80% Less Quantization Error, 80x Faster than Extended-RaBitQ (SIGMOD 2026)](https://arxiv.org/abs/2509.12086)
+- [VIBE: Vector Index Benchmark for Embeddings (May 2025)](https://arxiv.org/abs/2505.17810)
 
 ### TurboQuant
 - [TurboQuant Paper (ICLR 2026)](https://arxiv.org/abs/2504.19874)

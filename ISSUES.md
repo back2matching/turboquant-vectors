@@ -96,10 +96,35 @@ No `rotate`, `keygen`, or `keyinfo` commands for PrivateEncoder.
 
 ---
 
+## Research-Informed Opportunities (from web researcher agent)
+
+### R1. TurboQuant paper trending NOW (March 25, 2026)
+TechCrunch, VentureBeat, Tom's Hardware, 500+ HN points. The name "TurboQuant" is viral. Window of peak attention is 1-2 weeks. Marketing posts should go out ASAP.
+
+### R2. New attack: Jina AI Conditional Masked Diffusion (Feb 2026)
+81% token accuracy, black-box, 8 forward passes. Added to threat model. Rotation defeats it (same reason as Vec2Text).
+
+### R3. SAQ (SIGMOD 2026) claims 80% less quantization error than Extended-RaBitQ
+New competitor for compression. Data-dependent (needs PCA), unlike TurboQuant which is data-oblivious. Should benchmark against.
+
+### R4. SPARSE (ICLR 2026) — potential "strict mode" add-on
+Concept-aware elliptical noise defense. Could complement rotation: rotate for zero-loss scramble, then optionally apply SPARSE-style noise for defense-in-depth against known-plaintext attacks.
+
+### R5. IronCore now does encrypted model training (July 2025)
+Gartner Cool Vendor. Their encrypted-training feature is a differentiator we don't have. Still lossy though.
+
+### R6. RecSys 2025 reproducibility study validates compression+privacy
+Confirmed quantization reduces Vec2Text effectiveness. Validates our combined rotate+compress story.
+
+### R7. No other rotation-based privacy package exists on PyPI
+salty-embeddings (GitHub, 3 stars, permutation only, no PyPI) is the only thing close. Market remains open.
+
+---
+
 ## Documentation
 
 ### D1. Marketing docs not posted
-Reddit, HN, Twitter drafts exist but haven't been posted.
+Reddit, HN, Twitter drafts exist but haven't been posted. TurboQuant is trending NOW — window closing.
 
 ### D2. No CHANGELOG
 Version jumps from 0.2.1 to 0.3.0 with no changelog.

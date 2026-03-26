@@ -71,7 +71,18 @@ The current state of the art for strict black-box inversion.
 - Issues a limited number of online API queries to the embedding model
 - Achieves state-of-the-art fidelity in strict black-box settings
 
-### 1.5 Transferable Embedding Inversion (Huang et al., ACL 2024)
+### 1.5 Conditional Masked Diffusion (Jina AI, February 2026)
+
+Parallel masked denoising attack. Uses AdaLN conditioning to inject embedding vectors into a transformer decoder.
+
+- **Paper:** [arXiv:2602.11047](https://arxiv.org/html/2602.11047) by Han Xiao (Jina AI / Elastic)
+- Black-box: requires only 8 forward passes, NO access to target encoder at inference
+- 81.3% token accuracy (Qwen3-Embedding), 78.8% (EmbeddingGemma), 76.0% (jina-embeddings-v3)
+- Live demo: [embedding-inversion-demo.jina.ai](https://embedding-inversion-demo.jina.ai)
+- Still requires model-specific training (separate diffusion model per encoder)
+- **Rotation defeats this attack** for the same reason as Vec2Text: the diffusion model was trained on original-space embeddings, not rotated ones
+
+### 1.6 Transferable Embedding Inversion (Huang et al., ACL 2024)
 
 Transfer attack trained on one embedding model, applied to another without querying the target.
 
@@ -79,7 +90,7 @@ Transfer attack trained on one embedding model, applied to another without query
 - Identifies sensitive attributes (age, sex, disease) with 80-99% accuracy
 - Works cross-model: train on Model A, attack Model B
 
-### 1.6 Model Vulnerability Summary
+### 1.7 Model Vulnerability Summary
 
 | Embedding Model | Dims | Vec2Text Trained? | Inversion Risk |
 |----------------|------|-------------------|----------------|
@@ -332,6 +343,7 @@ The data owner holds the rotation matrix. Rotation protects against third-party 
 | Vec2Text (white-box) | **BROKEN** (92% at 32 tok) | **SAFE** | **SAFE** | **SAFE** |
 | Vec2Text (on rotated, no key) | N/A | **SAFE** | **SAFE** | **SAFE** |
 | ZSinvert / Zero2Text (universal) | **BROKEN** (partial) | **SAFE** | **SAFE** | **SAFE** |
+| Conditional Masked Diffusion (Jina, 2026) | **BROKEN** (81% token acc) | **SAFE** | **SAFE** | **SAFE** |
 | ALGEN (few-shot, 1K pairs from original space) | **BROKEN** | **SAFE** | **SAFE** | **SAFE** |
 | Attribute classifier (trained on original space) | **BROKEN** (80-99%) | **SAFE** | **SAFE** | **SAFE** |
 | Direct membership inference | **BROKEN** | **SAFE** | **SAFE** | **SAFE** |
@@ -353,6 +365,7 @@ Orthogonal rotation is an excellent first layer of defense with a genuinely uniq
 - [ALGEN: Few-shot Inversion Attacks on Textual Embeddings (Chen et al., ACL 2025)](https://aclanthology.org/2025.acl-long.1185/)
 - [ZSinvert: Universal Zero-shot Embedding Inversion (Zhang & Morris, 2025)](https://arxiv.org/abs/2504.00147)
 - [Zero2Text: Zero-Training Cross-Domain Inversion Attacks (2026)](https://arxiv.org/abs/2602.01757)
+- [Conditional Masked Diffusion for Embedding Inversion (Jina AI, 2026)](https://arxiv.org/abs/2602.11047)
 - [Transferable Embedding Inversion Attack (Huang et al., ACL 2024)](https://aclanthology.org/2024.acl-long.230/)
 - [Concept-Aware Privacy Mechanisms for Defending Embedding Inversion (ICLR 2026)](https://arxiv.org/html/2602.07090)
 - [TextCrafter: Optimization-Calibrated Noise for Defending Against Text Embedding Inversion](https://arxiv.org/html/2509.17302)
