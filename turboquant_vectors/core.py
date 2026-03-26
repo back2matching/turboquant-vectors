@@ -78,6 +78,10 @@ class TurboQuantVectors:
     """
 
     def __init__(self, dim: int, bits: int = 4, seed: int = 42):
+        if not (1 <= bits <= 8):
+            raise ValueError(f"bits must be 1-8, got {bits}")
+        if dim < 1:
+            raise ValueError(f"dim must be >= 1, got {dim}")
         self.dim = dim
         self.bits = bits
         self.n_centroids = 2 ** bits

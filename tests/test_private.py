@@ -427,8 +427,12 @@ class TestPinnedOutput:
         enc = PrivateEncoder.from_seed(dim=64, seed=seed)
         fp = enc.fingerprint()
         # Pin the expected fingerprint. If the derivation pipeline changes,
-        # this test catches it immediately.
-        assert len(fp) == 16
+        # this test catches it immediately — all saved .tqkey files would break.
+        assert fp == "4f240186f1a3c69b", (
+            f"Fingerprint changed from 4f240186f1a3c69b to {fp}. "
+            f"This means the key derivation pipeline changed and all "
+            f"previously generated .tqkey files from from_seed() are broken."
+        )
         # Re-derive to confirm determinism
         enc2 = PrivateEncoder.from_seed(dim=64, seed=seed)
         assert enc2.fingerprint() == fp

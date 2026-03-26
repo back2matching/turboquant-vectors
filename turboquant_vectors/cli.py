@@ -3,6 +3,7 @@
 import argparse
 import sys
 import time
+from pathlib import Path
 import numpy as np
 from turboquant_vectors.core import TurboQuantVectors, CompressedVectors
 
@@ -48,7 +49,7 @@ def main():
         compressed = tq.compress(vectors)
         elapsed = time.time() - t0
 
-        output = args.output or args.input.replace(".npy", f".tqv.npz")
+        output = args.output or str(Path(args.input).with_suffix('')) + '.tqv.npz'
         compressed.save(output)
 
         comp_mb = compressed.packed_memory_bytes / 1024**2

@@ -121,6 +121,44 @@ class TestSharedCodebook:
             assert len(cb) == 2 ** bits
 
 
+class TestTQVBitsValidation:
+    """Validate bits parameter in TurboQuantVectors constructor."""
+
+    def test_bits_zero_rejected(self):
+        with pytest.raises(ValueError, match="bits must be 1-8"):
+            TurboQuantVectors(dim=64, bits=0)
+
+    def test_bits_nine_rejected(self):
+        with pytest.raises(ValueError, match="bits must be 1-8"):
+            TurboQuantVectors(dim=64, bits=9)
+
+    def test_bits_negative_rejected(self):
+        with pytest.raises(ValueError, match="bits must be 1-8"):
+            TurboQuantVectors(dim=64, bits=-1)
+
+    def test_dim_zero_rejected(self):
+        with pytest.raises(ValueError, match="dim must be >= 1"):
+            TurboQuantVectors(dim=0, bits=4)
+
+
+class TestRotateAndCompressDimensionMismatch:
+    """Test dimension mismatch in rotate_and_compress."""
+
+    def test_wrong_dim_raises(self):
+        from turboquant_vectors.private import PrivateEncoder
+        enc = PrivateEncoder.generate(dim=64, normalize=False)
+        vecs = np.random.randn(10, 32).astype(np.float32)
+        with pytest.raises(ValueError):
+            enc.rotate_and_compress(vecs, bits=4)
+
+    def test_1d_input_raises(self):
+        from turboquant_vectors.private import PrivateEncoder
+        enc = PrivateEncoder.generate(dim=64, normalize=False)
+        vec = np.random.randn(64).astype(np.float32)
+        with pytest.raises(ValueError):
+            enc.rotate_and_compress(vec, bits=4)
+
+
 class TestEmptyInput:
 
     def test_compress_empty(self):
