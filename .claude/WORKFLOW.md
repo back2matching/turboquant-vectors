@@ -6,7 +6,7 @@
 
 **Last updated:** 2026-03-25
 **Branch:** dev
-**Tests:** 121 passing, 7.6s
+**Tests:** 124 passing, 7.8s
 
 ---
 
@@ -14,10 +14,10 @@
 
 > Incorporate the honest assessment findings. Fix overclaiming. Make the project genuinely solid.
 
-- [ ] A1. Fix README overclaiming — remove "First open-source implementation of TurboQuant" (we implement stage 1 only, not QJL). Reframe compression as "TurboQuant-inspired" or "rotation + scalar quantization". Keep privacy claims (those are accurate).
+- [x] A1. Fix README overclaiming — remove "First open-source implementation of TurboQuant" (we implement stage 1 only, not QJL). Reframe compression as "TurboQuant-inspired" or "rotation + scalar quantization". Keep privacy claims (those are accurate).
 - [ ] A2. Save honest assessment as `docs/research/HONEST-ASSESSMENT.md` — the brutal findings from the assessment agent are currently only in temp files. Persist them.
 - [ ] A3. Write educational blog post draft — `docs/marketing/BLOG-EMBEDDING-PRIVACY.md`. Not marketing hype. Educational: "Your Pinecone index leaks patient diagnoses: here's the math." Focus on the Vec2Text threat, show the Colab demo, link to package at the end.
-- [ ] A4. Add stochastic quantization option — one-line change in quantization loop. Privacy researcher said this gives formal Renyi DP from randomized rounding. Huge compliance value.
+- [x] A4. Add stochastic quantization option — one-line change in quantization loop. Privacy researcher said this gives formal Renyi DP from randomized rounding. Huge compliance value.
 - [ ] A5. Compute and hardcode correct Lloyd-Max centroids for 5-8 bit — currently uses uniform quantization for these. Compression researcher said this is suboptimal. Use scipy to compute correct values.
 
 ## Phase B: Make It Actually Useful
